@@ -1,9 +1,8 @@
-<!DOCTYPE html>
-<html>
-	<head>
-		<title>Nick Heiner - Living Social Data Challenge</title>
-	</head>
-	<body>
-		<p>oooo</p>
-	</body>
-</html>
+{% extends "base.html" %}
+{% block content %}
+<form enctype="multipart/form-data" method="post" action="">
+	{% csrf_token %}
+	{{ form }}
+	<input type="submit" value="Import" />
+</form>
+{% endblock %} 
