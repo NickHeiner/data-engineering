@@ -5,6 +5,7 @@ from django.conf.urls.defaults import patterns, include, url
 # admin.autodiscover()
 
 urlpatterns = patterns('',
+                       url(r'', 'data_challenge.views.index')
     # Examples:
     # url(r'^$', 'living_social.views.home', name='home'),
     # url(r'^living_social/', include('living_social.foo.urls')),
