@@ -1,0 +1,9 @@
+{% extends "logged_in_base.html" %}
+{% block content %}
+<form enctype="multipart/form-data" method="post" action="">
+	{% csrf_token %}
+	{{ form }}
+	<input type="submit" value="Import" />
+</form>
+{{ block.super }}
+{% endblock %} 

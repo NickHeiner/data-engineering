@@ -5,8 +5,11 @@ from django.conf.urls.defaults import patterns, include, url
 # admin.autodiscover()
 
 urlpatterns = patterns('',
+                       url(r'^$', 'data_challenge.views.index'),
                        url(r'success', 'data_challenge.views.success'),
-                       url(r'', 'data_challenge.views.index')
+                       url(r'upload', 'data_challenge.views.upload'),
+                       url(r'^logout/$', 'django.contrib.auth.views.logout'),
+                       url(r'^openid/', include('django_openid_auth.urls'))
     # Examples:
     # url(r'^$', 'living_social.views.home', name='home'),
     # url(r'^living_social/', include('living_social.foo.urls')),

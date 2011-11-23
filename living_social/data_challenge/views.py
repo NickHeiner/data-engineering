@@ -5,19 +5,25 @@ from django.template import RequestContext
 from django.http import HttpResponseRedirect
 import csv
 from data_challenge.models import Customer, Item, Merchant, Transaction
+from django.contrib.auth.decorators import login_required
 
 class UploadFileForm(forms.Form):
     file  = forms.FileField()
 
 def index(request):
+    return render_to_response("index.html")
+
+@login_required
+def upload(request):
     if request.method == "POST":
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
-            handle_uploaded_file(request.FILES['file'])
+            handleUploadedFile(request.FILES['file'])
             return HttpResponseRedirect('/success')
         
-    return render_to_response("index.html", {'form': UploadFileForm()}, context_instance=RequestContext(request))
+    return render_to_response("upload.html", {'form': UploadFileForm()}, context_instance=RequestContext(request))
 
+@login_required
 def success(request):
     revenue = getRevenue(Transaction.objects.all())
     return render_to_response("success.html", {'revenue': revenue})
@@ -25,7 +31,7 @@ def success(request):
 def getRevenue(transactions):
     return sum([transaction.quantity * transaction.item.price for transaction in transactions])
 
-def handle_uploaded_file(data_to_import):
+def handleUploadedFile(data_to_import):
     for record in list(data_to_import)[1:]:
         parseAndSave(record.split("\t"))
         
