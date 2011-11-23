@@ -1,5 +1,9 @@
 # Django settings for living_social project.
 
+# This must be an absolute path to the directory that contains directory "data-engineering"
+# You will have to change this to run this solution on your machine.
+ABSOLUTE_PATH_TO_PARENT_DIR = "C:/Users/Nick/Code/Living Social/"
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -117,7 +121,8 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    "C:\Users\Nick\Code\Living Social\data-engineering\living_social\data_challenge"
+    
+    ABSOLUTE_PATH_TO_PARENT_DIR + "data-engineering/living_social/data_challenge"
 )
 
 INSTALLED_APPS = (

@@ -10,6 +10,11 @@ from data_challenge.views import parseAndSave, getRevenue
 from data_challenge.models import Customer, Item, Merchant, Transaction
 
 class SimpleTest(TestCase):
+    """
+    Aptana replaces tabs with four spaces, so you'll see a lot of data.split("    ") instead of data.split("\t")
+    for the data that I'm making manually in these test.
+    """
+    
     def test_save(self):
         name = "Snake Plissken"
         description = "$10 off $20 of food"
@@ -17,6 +22,9 @@ class SimpleTest(TestCase):
         quantity = 43
         address = "987 Fake Street"
         merchantName = "Bob's Pizza"
+        
+        # Make sure that we aren't saving the same entities multiple times
+        # Together, these two parseAndSave calls should only persist a single customer, item, and merchant
         parseAndSave([name, description, price, quantity, address, merchantName])
         parseAndSave([name, description, price, quantity, address, merchantName])
         
@@ -25,7 +33,9 @@ class SimpleTest(TestCase):
         customer = Customer.objects.get(name=name)
         item = Item.objects.get(description=description, price=price)
         merchant = Merchant.objects.get(address=address, name=merchantName)
-        Transaction.objects.get(customer=customer, item=item, merchant=merchant, quantity=quantity)
+        
+        # This should return 2 objects
+        self.assertEqual(2, len(Transaction.objects.filter(customer=customer, item=item, merchant=merchant, quantity=quantity)))
     
     def test_parse_line_customer(self):
         name = "Fooo Bar"
@@ -54,20 +64,27 @@ class SimpleTest(TestCase):
         self.assertEqual(transaction.merchant, merchant)
         self.assertEqual(transaction.quantity, quantity)
         
+    def parseLines(self, data):
+        [parseAndSave(line.split("    ")) for line in data.splitlines()]
+
     def test_get_revenue(self):
         prices = (23, 43, 808, 21)
         quantities = (1, 20, 43, 99)
         
+        # This double string formatting is not the prettiest thing in the world... I wonder if there's a better way to do it
         data = ("""Snake Plissken    $10 off $20 of food    %f    %%d    987 Fake St    Bob's Pizza
 Amy Pond    $30 of awesome for $10    %f    %%d    456 Unreal Rd    Tom's Awesome Shop
 Marty McFly    $20 Sneakers for $5    %f    %%d    123 Fake St    Sneaker Store Emporium
 Snake Plissken    $20 Sneakers for $5    %f    %%d    123 Fake St    Sneaker Store Emporium""" % prices) % quantities 
 
-        [parseAndSave(line.split("    ")) for line in data.splitlines()]
+        self.parseLines(data)
         
         revenue = sum((quantity * price for quantity, price in zip(quantities, prices)))
-        
         self.assertEqual(revenue, getRevenue(Transaction.objects.all()))
+
+        # If all the transactions happen again, we should record twice as much revenue        
+        self.parseLines(data)
+        self.assertEqual(revenue * 2, getRevenue(Transaction.objects.all()))
     
     def test_get_revenue_sample_data(self):
         data = """Snake Plissken    $10 off $20 of food    10.0    2    987 Fake St    Bob's Pizza
@@ -75,7 +92,7 @@ Amy Pond    $30 of awesome for $10    10.0    5    456 Unreal Rd    Tom's Awesom
 Marty McFly    $20 Sneakers for $5    5.0    1    123 Fake St    Sneaker Store Emporium
 Snake Plissken    $20 Sneakers for $5    5.0    4    123 Fake St    Sneaker Store Emporium"""
 
-        [parseAndSave(line.split("    ")) for line in data.splitlines()]
+        self.parseLines(data)
         
         self.assertEqual(95, getRevenue(Transaction.objects.all()))
         
