@@ -16,15 +16,15 @@ class SimpleTest(TestCase):
         price = 10.3
         quantity = 43
         address = "987 Fake Street"
-        merchant_name = "Bob's Pizza"
-        parseAndSave([name, description, price, quantity, address, merchant_name])
-        parseAndSave([name, description, price, quantity, address, merchant_name])
+        merchantName = "Bob's Pizza"
+        parseAndSave([name, description, price, quantity, address, merchantName])
+        parseAndSave([name, description, price, quantity, address, merchantName])
         
         # This will throw an exception if the models haven't been persisted properly,
         # or if they have been persisted multiple times
         customer = Customer.objects.get(name=name)
         item = Item.objects.get(description=description, price=price)
-        merchant = Merchant.objects.get(address=address, name=merchant_name)
+        merchant = Merchant.objects.get(address=address, name=merchantName)
         Transaction.objects.get(customer=customer, item=item, merchant=merchant, quantity=quantity)
     
     def test_parse_line_customer(self):
@@ -69,6 +69,13 @@ Snake Plissken    $20 Sneakers for $5    %f    %%d    123 Fake St    Sneaker Sto
         
         self.assertEqual(revenue, getRevenue(Transaction.objects.all()))
     
+    def test_get_revenue_sample_data(self):
+        data = """Snake Plissken    $10 off $20 of food    10.0    2    987 Fake St    Bob's Pizza
+Amy Pond    $30 of awesome for $10    10.0    5    456 Unreal Rd    Tom's Awesome Shop
+Marty McFly    $20 Sneakers for $5    5.0    1    123 Fake St    Sneaker Store Emporium
+Snake Plissken    $20 Sneakers for $5    5.0    4    123 Fake St    Sneaker Store Emporium"""
+
+        [parseAndSave(line.split("    ")) for line in data.splitlines()]
         
-        
+        self.assertEqual(95, getRevenue(Transaction.objects.all()))
         
