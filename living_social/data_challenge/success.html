@@ -1,5 +1,6 @@
 {% extends "logged_in_base.html" %}
 {% block content %}
-Total recorded revenue: {{ revenue }}
+<p>Total recorded revenue in most recently uploaded file: {{ revenue }}</p>
+<p><a href="/upload">Upload another</a></p>
 {{ block.super }}
 {% endblock %} 

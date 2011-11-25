@@ -30,7 +30,14 @@ def upload(request):
 
 @login_required
 def success(request):
-    return render_to_response("success.html", {'revenue': getRevenue(Transaction.objects.all())})
+    mostRecentTransactions = Transaction.objects.filter(fromMostRecentFile=True)
+    revenue = getRevenue(mostRecentTransactions)
+    
+    for transaction in mostRecentTransactions:
+        transaction.fromMostRecentFile = False
+        transaction.save()
+        
+    return render_to_response("success.html", {'revenue': revenue})
 
 def getRevenue(transactions):
     return sum([transaction.quantity * transaction.item.price for transaction in transactions])
@@ -47,7 +54,7 @@ def parseAndSave(record):
      merchant = Merchant.objects.get_or_create(address=record[4], name=record[5])
      
      # Create a new transaction for this row, even if we've seen an identical one before
-     transaction = Transaction(customer=customer[0], item=item[0], merchant=merchant[0], quantity=int(record[3]))
+     transaction = Transaction(customer=customer[0], item=item[0], merchant=merchant[0], quantity=int(record[3]), fromMostRecentFile=True)
      transaction.save()
      
      # return for testing. We could also access the values by looking in the database, but 

@@ -19,3 +19,7 @@ class Transaction(models.Model):
     item = models.ForeignKey(Item)
     merchant = models.ForeignKey(Merchant)
     quantity = models.IntegerField()
+    
+    # True if this transaction was stored in the most
+    # recently uploaded file; false otherwise.
+    fromMostRecentFile = models.BooleanField()
